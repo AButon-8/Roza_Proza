@@ -158,6 +158,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#сбор-данных" id="toc-сбор-данных" class="nav-link active" data-scroll-target="#сбор-данных">Сбор данных</a></li>
   <li><a href="#предобработка-данных" id="toc-предобработка-данных" class="nav-link" data-scroll-target="#предобработка-данных">Предобработка данных</a></li>
+  <li><a href="#аннотирование-текста" id="toc-аннотирование-текста" class="nav-link" data-scroll-target="#аннотирование-текста">Аннотирование текста</a></li>
   </ul>
 </nav>
 </nav>
@@ -393,22 +394,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Получаем Large list.</span></span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>raw_all_roza_texts <span class="ot">&lt;-</span> <span class="fu">map</span>(all_roza_urls, get_text)</span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Превращаем список в символьный вектор, а его в таблицу</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>raw_roza_texts_tbl <span class="ot">&lt;-</span> raw_all_roza_texts <span class="sc">|&gt;</span> </span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flatten_chr</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>()</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Объединяем две таблицы (ссылки, названия текстов и сами тексты)</span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>all_roza_proza <span class="ot">&lt;-</span> all_links <span class="sc">|&gt;</span> </span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> raw_roza_texts_tbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Превращаем список в символьный вектор, а его в таблицу</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>raw_roza_texts_tbl <span class="ot">&lt;-</span> raw_all_roza_texts <span class="sc">|&gt;</span> </span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flatten_chr</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>()</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Объединяем две таблицы (ссылки, названия текстов и сами тексты)</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>all_roza_proza <span class="ot">&lt;-</span> all_links <span class="sc">|&gt;</span> </span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> raw_roza_texts_tbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 </section>
 <section id="предобработка-данных" class="level2">
 <h2 class="anchored" data-anchor-id="предобработка-данных">Предобработка данных</h2>
-<p><br> <strong>1. Чистим данные с помощью регулярных выражений.</strong></p>
+<p><br> <strong>Чистим данные с помощью регулярных выражений.</strong></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Чистим регулярными выражениями</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Переименовываем столбец</span></span>
@@ -432,6 +431,44 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">gsub</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">b([Шш]ое|[Шш]оэ|[Шш]</span><span class="sc">\\</span><span class="st">.)</span><span class="sc">\\</span><span class="st">S*"</span>, <span class="st">"Schönlank_</span><span class="sc">\\</span><span class="st">1"</span>, text)) <span class="sc">|&gt;</span> </span>
 <span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">gsub</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">b([Мм]атиль</span><span class="sc">\\</span><span class="st">S*)"</span>, <span class="st">"MATILDA_</span><span class="sc">\\</span><span class="st">1"</span>, text)) <span class="sc">|&gt;</span> </span>
 <span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">gsub</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">b([Лл]улу)"</span>, <span class="st">"LULU_</span><span class="sc">\\</span><span class="st">1"</span>, text))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+</section>
+<section id="аннотирование-текста" class="level2">
+<h2 class="anchored" data-anchor-id="аннотирование-текста">Аннотирование текста</h2>
+<p><br> <strong>Скачиваем и загружаем модель. Аннотируем.</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Скачиваем модель в рабочую директорию</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># udpipe_download_model(language = "russian-syntagrus")</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># загружаем модель</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>russian_syntagrus <span class="ot">&lt;-</span> <span class="fu">udpipe_load_model</span>(<span class="at">file =</span> <span class="st">"russian-syntagrus-ud-2.5-191206.udpipe"</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Оператор присваивания создает переменную params.</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>params <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>tbl, <span class="sc">~</span>output, <span class="sc">~</span>input, <span class="sc">~</span>token,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  all_roza_cleaned, <span class="st">"word"</span>, <span class="st">"text"</span>, <span class="st">"words"</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>params</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 4
+  tbl                output input token
+  &lt;list&gt;             &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;
+1 &lt;tibble [184 × 4]&gt; word   text  words</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># аннотируем</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>all_roza_annotate <span class="ot">&lt;-</span> <span class="fu">udpipe_annotate</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  russian_syntagrus, </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  all_roza_cleaned<span class="sc">$</span>text, </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">doc_id =</span> all_roza_proza<span class="sc">$</span>title)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co"># преобразуем аннотированное в тибл</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>all_roza_ann_tbl <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(all_roza_annotate) <span class="sc">|&gt;</span> </span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>paragraph_id, <span class="sc">-</span>sentence, <span class="sc">-</span>xpos) <span class="sc">|&gt;</span> </span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 

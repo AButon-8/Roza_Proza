@@ -30,7 +30,6 @@ library(wordcloud)
 **2. Список переводов писем Розы Люксембург размещен на 4 веб-страницах, по 50 url на каждой. Соберем все 184 ссылки.**
 
 ```{r}
-
 # первая страница с ссылками (0-50)
 url1 <- "https://proza.ru/avtor/cnamibog&s=0&book=45#45" 
 html1 <-  read_html(url1, encoding = "Windows-1251") # читаем html, меняем кодировку
@@ -86,7 +85,6 @@ all_links <- list(list_links1, list_links2, list_links3, list_links4) |>
 # Выводим объединённую таблицу
 print(all_links)
 
-
 # Добавляем (paste0 += без пробела) протокол доступа и доменное имя. 
 # Получаем полные URL-адреса страниц с главами повести.
 all_links <- all_links |>
@@ -117,12 +115,10 @@ get_text <- function(url){
 # Получаем Large list.
 raw_all_roza_texts <- map(all_roza_urls, get_text)
 
-
 # Превращаем список в символьный вектор, а его в таблицу
 raw_roza_texts_tbl <- raw_all_roza_texts |> 
   flatten_chr() |> 
   as_tibble()
-
 
 # Объединяем две таблицы (ссылки, названия текстов и сами тексты)
 all_roza_proza <- all_links |> 
@@ -134,7 +130,7 @@ all_roza_proza <- all_links |>
 ## Предобработка данных
 
 <br/> 
-**1. Чистим данные с помощью регулярных выражений.**
+**Чистим данные с помощью регулярных выражений.**
 
 ```{r}
 # Чистим регулярными выражениями
@@ -159,4 +155,40 @@ all_roza_cleaned <- all_roza_proza |>
   mutate(text = gsub("\\b([Шш]ое|[Шш]оэ|[Шш]\\.)\\S*", "Schönlank_\\1", text)) |> 
   mutate(text = gsub("\\b([Мм]атиль\\S*)", "MATILDA_\\1", text)) |> 
   mutate(text = gsub("\\b([Лл]улу)", "LULU_\\1", text))
+```
+
+<br/>
+
+## Аннотирование текста
+
+<br/> 
+**Скачиваем и загружаем модель. Аннотируем.**
+
+```{r}
+# Скачиваем модель в рабочую директорию
+# udpipe_download_model(language = "russian-syntagrus")
+
+# загружаем модель
+russian_syntagrus <- udpipe_load_model(file = "russian-syntagrus-ud-2.5-191206.udpipe")
+
+# Оператор присваивания создает переменную params.
+params <- tribble(
+  ~tbl, ~output, ~input, ~token,
+  all_roza_cleaned, "word", "text", "words"
+)
+
+params
+
+# аннотируем
+#| echo: false
+all_roza_annotate <- udpipe_annotate(
+  russian_syntagrus, 
+  all_roza_cleaned$text, 
+  doc_id = all_roza_proza$title)
+
+# преобразуем аннотированное в тибл
+#| echo: false
+all_roza_ann_tbl <- as_tibble(all_roza_annotate) |> 
+  select(-paragraph_id, -sentence, -xpos) |> 
+  as_tibble()
 ```
