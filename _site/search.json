@@ -152,5 +152,26 @@
     "title": "Данные",
     "section": "Аннотирование текста",
     "text": "Аннотирование текста\n Скачиваем и загружаем модель. Аннотируем.\n\n# Скачиваем модель в рабочую директорию\n# udpipe_download_model(language = \"russian-syntagrus\")\n\n# загружаем модель\nrussian_syntagrus &lt;- udpipe_load_model(file = \"russian-syntagrus-ud-2.5-191206.udpipe\")\n\n# Оператор присваивания создает переменную params.\nparams &lt;- tribble(\n  ~tbl, ~output, ~input, ~token,\n  all_roza_cleaned, \"word\", \"text\", \"words\"\n)\n\nparams\n\n# A tibble: 1 × 4\n  tbl                output input token\n  &lt;list&gt;             &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;\n1 &lt;tibble [184 × 4]&gt; word   text  words\n\n# аннотируем\n#| echo: false\nall_roza_annotate &lt;- udpipe_annotate(\n  russian_syntagrus, \n  all_roza_cleaned$text, \n  doc_id = all_roza_proza$title)\n\n# преобразуем аннотированное в тибл\n#| echo: false\nall_roza_ann_tbl &lt;- as_tibble(all_roza_annotate) |&gt; \n  select(-paragraph_id, -sentence, -xpos) |&gt; \n  as_tibble()"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "index",
+    "section": "",
+    "text": "Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see https://quarto.org."
+  },
+  {
+    "objectID": "index.html#quarto",
+    "href": "index.html#quarto",
+    "title": "index",
+    "section": "",
+    "text": "Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see https://quarto.org."
+  },
+  {
+    "objectID": "index.html#running-code",
+    "href": "index.html#running-code",
+    "title": "index",
+    "section": "Running Code",
+    "text": "Running Code\nWhen you click the Render button a document will be generated that includes both content and the output of embedded code. You can embed code like this:\n\n1 + 1\n\n[1] 2\n\n\nYou can add options to executable code like this\n\n\n[1] 4\n\n\nThe echo: false option disables the printing of code (only output is displayed)."
   }
 ]
