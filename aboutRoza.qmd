@@ -16,7 +16,7 @@ df-print: paged #оформление таблиц
 code-annotations: hover
 fig-align: left
 warning: FALSE
-bibliography: Rosa_bib_test2.bib
+bibliography: roza_proza.bib
 csl: gost-r-7-0-5-2008-numeric-alphabetical.csl
 embed-resources: true
 standalone: true
