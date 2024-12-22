@@ -1,0 +1,44 @@
+---
+title: "Другая Роза"
+subtitle: "Письма Розы Люксембург <br> в переводе Маргариты Школьниксон-Смишко"
+author: "Анастасия Богданова"
+date: today
+date-format: D.MM.YYYY
+format: html
+editor: visual
+abstract: "Письма — больше чем воспоминания, на них запеклась кровь событий, это — само прошедшее, как оно было, задержанное и нетленное. (*А.И. Герцен. Былое и думы.*)"
+lang: ru
+toc: true #оглавление
+toc-location: left
+# number-sections: false #нумерация оглавления
+theme: journal
+df-print: paged #оформление таблиц
+code-annotations: hover
+fig-align: left
+warning: FALSE
+bibliography: Rosa_bib_test2.bib
+csl: gost-r-7-0-5-2008-numeric-alphabetical.csl
+embed-resources: true
+standalone: true
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
