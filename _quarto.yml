@@ -1,6 +1,6 @@
 project:
   type: website
-  # output-dir: docs
+  output-dir: data
 
 website:
   title: "«Другая Роза» на сайте proza.ru"
