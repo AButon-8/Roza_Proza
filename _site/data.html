@@ -157,6 +157,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#сбор-данных" id="toc-сбор-данных" class="nav-link active" data-scroll-target="#сбор-данных">Сбор данных</a></li>
+  <li><a href="#предобработка-данных" id="toc-предобработка-данных" class="nav-link" data-scroll-target="#предобработка-данных">Предобработка данных</a></li>
   </ul>
 </nav>
 </nav>
@@ -271,13 +272,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 10 неловкие попытки          /2015/04/27/493 
 # ℹ 174 more rows</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Добавляем (paste0 += без пробела) протокол доступа и доменное имя. Получаем полные URL-адреса страниц с главами повести.</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>all_links <span class="ot">&lt;-</span> all_links <span class="sc">|&gt;</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">link =</span> <span class="fu">paste0</span>(<span class="st">"https://proza.ru"</span>, id_text)) </span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#select(-id_text) не делаю, пригодится id записи = дате публикации</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Добавляем (paste0 += без пробела) протокол доступа и доменное имя. </span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Получаем полные URL-адреса страниц с главами повести.</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>all_links <span class="ot">&lt;-</span> all_links <span class="sc">|&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">link =</span> <span class="fu">paste0</span>(<span class="st">"https://proza.ru"</span>, id_text)) </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># select(-id_text) не делаю, id записи = дате публикации</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Извлечем список всех ссылок</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Извлекаем список всех ссылок</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>all_roza_urls <span class="ot">&lt;-</span> all_links <span class="sc">|&gt;</span> </span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(link)</span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
@@ -376,6 +377,61 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 [181] "https://proza.ru/2014/11/27/584"  "https://proza.ru/2014/11/27/839" 
 [183] "https://proza.ru/2014/11/28/947"  "https://proza.ru/2014/04/06/985" </code></pre>
 </div>
+</div>
+<p><br></p>
+<p><strong>4. Скрапинг текста</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Напишем функцию для скрапинга текста</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>get_text <span class="ot">&lt;-</span> <span class="cf">function</span>(url){</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_html</span>(url, <span class="at">encoding =</span> <span class="st">"Windows-1251"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">html_elements</span>(<span class="st">".text"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">html_text2</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste</span>(<span class="at">collapse=</span><span class="st">" "</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Применим функцию к полному списку извлеченных ссылок. </span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Получаем Large list.</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>raw_all_roza_texts <span class="ot">&lt;-</span> <span class="fu">map</span>(all_roza_urls, get_text)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Превращаем список в символьный вектор, а его в таблицу</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>raw_roza_texts_tbl <span class="ot">&lt;-</span> raw_all_roza_texts <span class="sc">|&gt;</span> </span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flatten_chr</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>()</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Объединяем две таблицы (ссылки, названия текстов и сами тексты)</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>all_roza_proza <span class="ot">&lt;-</span> all_links <span class="sc">|&gt;</span> </span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> raw_roza_texts_tbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+</section>
+<section id="предобработка-данных" class="level2">
+<h2 class="anchored" data-anchor-id="предобработка-данных">Предобработка данных</h2>
+<p><br> <strong>1. Чистим данные с помощью регулярных выражений.</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Чистим регулярными выражениями</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Переименовываем столбец</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Удаляем HTML-теги</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Унифицируем кавычки, апострофы</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Убираем лишние переводы строки (включая пробелы вокруг них), заменяем их на пробел</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Убираем звездочки перед словами (от примечаний)</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Ставим перед записанными с ошибками именами МАРКЕР</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>all_roza_cleaned <span class="ot">&lt;-</span> all_roza_proza <span class="sc">|&gt;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> text<span class="sc">$</span>value) <span class="sc">|&gt;</span> </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">str_remove_all</span>(<span class="fu">as.character</span>(text), <span class="st">"&lt;[^&gt;]+&gt;"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">str_replace_all</span>(text, <span class="st">"[«»„”‘’]"</span>, <span class="st">"</span><span class="sc">\"</span><span class="st">"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">gsub</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">s*</span><span class="sc">\\</span><span class="st">n+</span><span class="sc">\\</span><span class="st">s*"</span>, <span class="st">" "</span>, text)) <span class="sc">|&gt;</span> </span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">gsub</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">b([Нн]и{1,2}у</span><span class="sc">\\</span><span class="st">S*)"</span>, <span class="st">"NIU_</span><span class="sc">\\</span><span class="st">1"</span>, text)) <span class="sc">|&gt;</span> </span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">gsub</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">b([Кк]ост</span><span class="sc">\\</span><span class="st">S*)"</span>, <span class="st">"KOSTYA_</span><span class="sc">\\</span><span class="st">1"</span>, text)) <span class="sc">|&gt;</span> </span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">gsub</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">b([Юю]{2}</span><span class="sc">\\</span><span class="st">S*)"</span>, <span class="st">"YuYu_</span><span class="sc">\\</span><span class="st">1"</span>, text)) <span class="sc">|&gt;</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">gsub</span>(<span class="st">"^[*]+"</span>, <span class="st">""</span>, text)) <span class="sc">|&gt;</span> </span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">str_replace_all</span>(text, <span class="st">"</span><span class="sc">\\</span><span class="st">b([Рр]оз(?!енфельд|енталь)(</span><span class="sc">\\</span><span class="st">S*))"</span>, <span class="st">"ROZA_</span><span class="sc">\\</span><span class="st">1"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">gsub</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">b([Мм]ими)"</span>, <span class="st">"MIMI_</span><span class="sc">\\</span><span class="st">1"</span>, text)) <span class="sc">|&gt;</span> </span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">gsub</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">b([Дд][Цц]ио|[Цц]иу|[Дд]иу)</span><span class="sc">\\</span><span class="st">S*"</span>, <span class="st">"DZIO_</span><span class="sc">\\</span><span class="st">1"</span>, text)) <span class="sc">|&gt;</span> </span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">gsub</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">b([Шш]ое|[Шш]оэ|[Шш]</span><span class="sc">\\</span><span class="st">.)</span><span class="sc">\\</span><span class="st">S*"</span>, <span class="st">"Schönlank_</span><span class="sc">\\</span><span class="st">1"</span>, text)) <span class="sc">|&gt;</span> </span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">gsub</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">b([Мм]атиль</span><span class="sc">\\</span><span class="st">S*)"</span>, <span class="st">"MATILDA_</span><span class="sc">\\</span><span class="st">1"</span>, text)) <span class="sc">|&gt;</span> </span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">gsub</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">b([Лл]улу)"</span>, <span class="st">"LULU_</span><span class="sc">\\</span><span class="st">1"</span>, text))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
