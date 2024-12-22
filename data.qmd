@@ -1,26 +1,101 @@
 ---
-title: "data"
+title: "Данные"
+subtitle: "На этой странице: сбор и предобработка данных. Код и комментарии к нему."
 format: html
+warning: FALSE
 editor: visual
 ---
 
-## Quarto
+------------------------------------------------------------------------
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+<br/>
 
-## Running Code
+## Сбор данных
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
-```
-
-You can add options to executable code like this
+<br/> 
+**1. Загружаем все необходимые для нашего исследования библиотеки.**
 
 ```{r}
-#| echo: false
-2 * 2
+library(tidyverse)
+library(rvest)
+library(tidytext)
+library(tokenizers)
+library(udpipe)
+library(dplyr)
+library(wordcloud)
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+<br/>
+
+**2. Список переводов писем Розы Люксембург размещен на 4 веб-страницах, по 50 url на каждой. Соберем все 184 ссылки.**
+
+```{r}
+
+# первая страница с ссылками (0-50)
+url1 <- "https://proza.ru/avtor/cnamibog&s=0&book=45#45" 
+html1 <-  read_html(url1, encoding = "Windows-1251") # читаем html, меняем кодировку
+
+#.poemlink - список ссылок на нужные страницы, собранный с помощью SelectorGadget
+
+list_links1 <- html1 |> 
+  html_elements(".poemlink") # загружаем список ссылок
+
+
+# вторая страница с ссылками (51-100)
+url2 <- "https://proza.ru/avtor/cnamibog&s=50&book=45#45" 
+html2 <-  read_html(url2, encoding = "Windows-1251") # читаем html, меняем кодировку
+
+#.poemlink - список ссылок на нужные страницы, собранный с помощью SelectorGadget
+
+list_links2 <- html2 |> 
+  html_elements(".poemlink") # загружаем список ссылок
+
+
+# третья страница с ссылками (101-150)
+url3 <- "https://proza.ru/avtor/cnamibog&s=100&book=45#45" 
+html3 <-  read_html(url3, encoding = "Windows-1251") # читаем html, меняем кодировку
+
+#.poemlink - список ссылок на нужные страницы, собранный с помощью SelectorGadget
+
+list_links3 <- html3 |> 
+  html_elements(".poemlink") # загружаем список ссылок
+
+
+# четвертая страница с ссылками (151-184)
+url4 <- "https://proza.ru/avtor/cnamibog&s=150&book=45#45" 
+html4 <-  read_html(url4, encoding = "Windows-1251") # читаем html, меняем кодировку
+
+#.poemlink - список ссылок на нужные страницы, собранный с помощью SelectorGadget
+
+list_links4 <- html4 |> 
+  html_elements(".poemlink") # загружаем список ссылок
+```
+
+<br/>
+
+**3. Создадим таблицу с URL-ссылками на все 184 текста.**
+
+```{r}
+# Объединяем списки в один, частичный URL
+all_links <- list(list_links1, list_links2, list_links3, list_links4) |> 
+  map_dfr(~ tibble(
+    title = .x |> html_text2(),
+    id_text = .x |> html_attr("href")
+  ))
+
+# Выводим объединённую таблицу
+print(all_links)
+
+
+# Добавляем (paste0 += без пробела) протокол доступа и доменное имя. Получаем полные URL-адреса страниц с главами повести.
+all_links <- all_links |>
+  mutate(link = paste0("https://proza.ru", id_text)) 
+#select(-id_text) не делаю, пригодится id записи = дате публикации
+
+
+# Извлечем список всех ссылок
+all_roza_urls <- all_links |> 
+  pull(link)
+
+print(all_roza_urls)
+```
