@@ -1,8 +1,68 @@
 ---
-title: "personalies"
+title: "Персоналии"
+subtitle: "Расскажем о героях повести."
 format: html
+warning: FALSE
 editor: visual
 ---
+
+```{r}
+library(tidyverse)
+library(rvest)
+library(tidytext)
+library(tokenizers)
+library(udpipe)
+library(dplyr)
+library(ggplot2)
+library(wordcloud)
+```
+
+```{r}
+# Находим все имена собственные в тексте
+propn_list <- all_roza_ann_tbl |>
+  filter(upos == "PROPN") |> 
+  filter(str_detect(feats, "Animacy=Inan")) |> 
+  count(lemma) |> 
+  arrange(-n)
+
+propn_list
+```
+
+```{r}
+# Посчитаем упоминаемых персон - исправить списки - добавились МАРКЕРЫ
+# Заменить леммы на МАРКЕРЫ!
+persona_qty <- all_roza_ann_tbl |> 
+  filter(lemma == "Роза" | lemma == "Клара" | lemma == "Ниуниу" 
+         | lemma == "Кост" | lemma == "Цеткин" | lemma == "Дифенбах"
+         | lemma == "Люксембург" | lemma == "Вронка" | lemma == "Матильд"
+         | lemma == "кость" | lemma == "Матильда"| lemma == "Меринг" 
+         | lemma == "Юя" | lemma == "Костя" | lemma == "дорогой" 
+         | lemma == "Бебель" | lemma == "Шоенланк" | lemma == "Гертруд"
+         | lemma == "Либкнехта" | lemma == "Парвус" | lemma == "сон"
+         | lemma == "«Ниуниу" | lemma == "Вурм" | lemma == "Дциодциу"
+         | lemma == "Розин" | lemma == "Адольф" | lemma == "Розенталь"
+         | lemma == "Розенфельд" | lemma == "Розина" | lemma == "Толст"
+         | lemma == "Карл" | lemma == "Марта" | lemma == "Ниуниа"
+         | lemma == "Пауль" | lemma == "Розино" | lemma == "Троиц" 
+         | lemma == "Фаисст" | lemma == "Ханс" | lemma == "Дциодциус"
+         | lemma == "Костик" | lemma == "Лул" | lemma == "Ниуниус" 
+         | lemma == "август" | lemma == "Рикарда" | lemma == "Турнер" 
+         | lemma == "Бах" | lemma == "Берндштейн" | lemma == "Бы" 
+         | lemma == "Гольдберг" | lemma == "Дциодцио" | lemma == "Каролус" 
+         | lemma == "Куртхен" | lemma == "Луиза" | lemma == "Мария" 
+         | lemma == "Мёрика" | lemma == "Роберт" | lemma == "Соня" 
+         | lemma == "Ханнес" | lemma == "Хэнхен" | lemma == "«Дциодциу" 
+         | lemma == "Августина" | lemma == "Боутен" | lemma == "Веггис" 
+         | lemma == "Вронкэ" | lemma == "Голсуорси" | lemma == "Диудиа" 
+         | lemma == "Диудиу" | lemma == "Дорогуль" | lemma == "Каутский" 
+         | lemma == "Максим" | lemma == "**Парвус" | token == "Мими" 
+         | lemma == "Юю") |> 
+  select(doc_id, lemma, token, upos, feats, link) |>
+  count(lemma, sort = TRUE)
+
+
+persona_qty
+```
 
 ## Quarto
 
