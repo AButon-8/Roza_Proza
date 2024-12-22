@@ -15,10 +15,16 @@ library(udpipe)
 library(dplyr)
 library(ggplot2)
 library(wordcloud)
+library(readr)
 ```
 
 ```{r}
-# Находим все имена собственные в тексте
+all_roza_ann_tbl <- read.csv("data/all_roza_ann_tbl.csv")
+
+```
+
+```{r}
+# Находим все имена собственные в аннотированном тексте, считаем леммы
 propn_list <- all_roza_ann_tbl |>
   filter(upos == "PROPN") |> 
   filter(str_detect(feats, "Animacy=Inan")) |> 
@@ -38,7 +44,7 @@ persona_qty <- all_roza_ann_tbl |>
          | lemma == "кость" | lemma == "Матильда"| lemma == "Меринг" 
          | lemma == "Юя" | lemma == "Костя" | lemma == "дорогой" 
          | lemma == "Бебель" | lemma == "Шоенланк" | lemma == "Гертруд"
-         | lemma == "Либкнехта" | lemma == "Парвус" | lemma == "сон"
+         | lemma == "Либкнехта" | lemma == "Парвус" 
          | lemma == "«Ниуниу" | lemma == "Вурм" | lemma == "Дциодциу"
          | lemma == "Розин" | lemma == "Адольф" | lemma == "Розенталь"
          | lemma == "Розенфельд" | lemma == "Розина" | lemma == "Толст"
@@ -55,32 +61,13 @@ persona_qty <- all_roza_ann_tbl |>
          | lemma == "Августина" | lemma == "Боутен" | lemma == "Веггис" 
          | lemma == "Вронкэ" | lemma == "Голсуорси" | lemma == "Диудиа" 
          | lemma == "Диудиу" | lemma == "Дорогуль" | lemma == "Каутский" 
-         | lemma == "Максим" | lemma == "**Парвус" | token == "Мими" 
+         | lemma == "Максим" | token == "Мими" 
          | lemma == "Юю") |> 
-  select(doc_id, lemma, token, upos, feats, link) |>
+  select(doc_id, lemma, token, upos, feats) |>
   count(lemma, sort = TRUE)
 
 
 persona_qty
 ```
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
-```
-
-You can add options to executable code like this
-
-```{r}
-#| echo: false
-2 * 2
-```
-
-The `echo: false` option disables the printing of code (only output is displayed).
+## 

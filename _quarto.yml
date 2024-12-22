@@ -8,7 +8,7 @@ website:
     background: primary
     search: true
     left:
-      - href: aboutRoza.qmd
+      - href: index.qmd
         text: О Розе
       - href: data.qmd
         text: Данные
