@@ -19,7 +19,7 @@ library(readr)
 ```
 
 ```{r}
-all_roza_ann_tbl <- read.csv("data/all_roza_ann_tbl.csv")
+all_roza_ann_tbl <- read.csv("docs/data/all_roza_ann_tbl.csv")
 
 ```
 

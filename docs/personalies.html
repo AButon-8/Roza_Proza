@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>personalies – «Другая Роза» на сайте proza.ru</title>
+<title>Персоналии – «Другая Роза» на сайте proza.ru</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -122,7 +122,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./aboutRoza.html"> 
+    <a class="nav-link" href="./index.html"> 
 <span class="menu-text">О Розе</span></a>
   </li>  
   <li class="nav-item">
@@ -156,8 +156,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Страницы</h2>
    
   <ul>
-  <li><a href="#quarto" id="toc-quarto" class="nav-link active" data-scroll-target="#quarto">Quarto</a></li>
-  <li><a href="#running-code" id="toc-running-code" class="nav-link" data-scroll-target="#running-code">Running Code</a></li>
+  <li><a href="#section" id="toc-section" class="nav-link active" data-scroll-target="#section"></a></li>
   </ul>
 </nav>
 </nav>
@@ -170,7 +169,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">personalies</h1>
+<h1 class="title">Персоналии</h1>
+<p class="subtitle lead">Расскажем о героях повести.</p>
 </div>
 
 
@@ -187,26 +187,647 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="quarto" class="level2">
-<h2 class="anchored" data-anchor-id="quarto">Quarto</h2>
-<p>Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <a href="https://quarto.org" class="uri">https://quarto.org</a>.</p>
-</section>
-<section id="running-code" class="level2">
-<h2 class="anchored" data-anchor-id="running-code">Running Code</h2>
-<p>When you click the <strong>Render</strong> button a document will be generated that includes both content and the output of embedded code. You can embed code like this:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2</code></pre>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rvest)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tokenizers)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(udpipe)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(wordcloud)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
-<p>You can add options to executable code like this</p>
 <div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>all_roza_ann_tbl <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"docs/data/all_roza_ann_tbl.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Находим все имена собственные в аннотированном тексте, считаем леммы</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>propn_list <span class="ot">&lt;-</span> all_roza_ann_tbl <span class="sc">|&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(upos <span class="sc">==</span> <span class="st">"PROPN"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(feats, <span class="st">"Animacy=Inan"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(lemma) <span class="sc">|&gt;</span> </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>n)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>propn_list</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 4</code></pre>
+<pre><code>               lemma   n
+1             Берлин 141
+2              Клара  61
+3           ROZA_Роз  51
+4         NIU_Ниуниу  50
+5             Россия  39
+6             Цеткин  39
+7          Швейцария  37
+8           Германия  36
+9          Штуттгарт  32
+10            Польша  27
+11   MATILDA_Матильд  26
+12          Дифенбах  25
+13        Люксембург  25
+14         Рождество  23
+15            Цюрихо  22
+16         DZIO_Дцио  19
+17            Вронка  17
+18         Франкфурт  17
+19            Меринг  16
+20         Штуттгард  16
+21  MATILDA_Матильда  13
+22           Варшава  13
+23             Париж  13
+24         Петербург  13
+25            Бебель  12
+26            Мюнхен  12
+27           Франция  12
+28           Дрезден  11
+29           Лейпциг  11
+30           Силезия  11
+31        Шварцвальд  11
+32           дорогой  11
+33               сон  11
+34           Гамбург  10
+35           Гертруд  10
+36            Италия  10
+37         Либкнехта  10
+38            Парвус  10
+39             Баден   9
+40            Египет   9
+41              Вурм   8
+42         Магдебург   8
+43        Розенфельд   8
+44      KOSTYA_Кость   7
+45        ROZA_Розин   7
+46           YuYu_Юя   7
+47            Адольф   7
+48               Йен   7
+49              Карл   7
+50             Толст   7
+51         ROZA_Роза   6
+52            Англия   6
+53              Дума   6
+54     Интернационал   6
+55             Китай   6
+56            Лондон   6
+57             Марта   6
+58             Пауль   6
+59             Троиц   6
+60            Фаисст   6
+61              Ханс   6
+62            вперёд   6
+63       KOSTYA_Кост   5
+64            Африка   5
+65            Москва   5
+66          Нюрнберг   5
+67         Розенталь   5
+68            Сибирь   5
+69            Солнце   5
+70          Тюрингия   5
+71            август   5
+72       ROZA_Розино   4
+73           Австрия   4
+74            Базель   4
+75      Барнимштрасс   4
+76            Бремен   4
+77              Вена   4
+78         Голландия   4
+79            Европа   4
+80            Кавказ   4
+81        Копенгаген   4
+82             Пасха   4
+83            Персия   4
+84                РЛ   4
+85          Саксония   4
+86            Турнер   4
+87          DZIO_Циу   3
+88          LULU_Лул   3
+89       NIU_Ниуниус   3
+90          ROZA_роз   3
+91             Алжир   3
+92               Бах   3
+93           Бельгия   3
+94              Берн   3
+95        Берндштейн   3
+96           Бреслау   3
+97                Бы   3
+98         Гольдберг   3
+99          Дорогуль   3
+100         Дортмунд   3
+101           Женева   3
+102          Каролус   3
+103          Корсика   3
+104           Краков   3
+105          Куртхен   3
+106         Лейпцига   3
+107         Мадерный   3
+108            Мария   3
+109           Мёрика   3
+110        Оффенбург   3
+111          Рикарда   3
+112           Роберт   3
+113              США   3
+114             Соня   3
+115        Тиргартен   3
+116        Финляндия   3
+117            Хаген   3
+118           Ханнес   3
+119           Хэнхен   3
+120    Шарлоттенбург   3
+121           Швеция   3
+122          верхний   3
+123            гарда   3
+124           дорога   3
+125            майна   3
+126             март   3
+127       NIU_Ниуниа   2
+128         YuYu_Ююк   2
+129        Августина   2
+130             Азия   2
+131        Амстердам   2
+132      Антикритика   2
+133           Боутен   2
+134           Веггис   2
+135        Вильгельм   2
+136           Вронкэ   2
+137          Гановер   2
+138        Голсуорси   2
+139      Грефенсберг   2
+140              Дон   2
+141         Дюизбург   2
+142           Ежирск   2
+143           Ейзены   2
+144            Запад   2
+145       Зилленбухо   2
+146               Ид   2
+147            Индия   2
+148         Карлсруэ   2
+149         Каспрзак   2
+150         Каутский   2
+151             Киль   2
+152          Кларино   2
+153         Кольберг   2
+154           Куокол   2
+155          Куртика   2
+156      Кёнигсхютте   2
+157             Лисс   2
+158            Литва   2
+159           Лозань   2
+160            Луиза   2
+161           Максим   2
+162       Маркгрэфин   2
+163           Мигнет   2
+164           Миллет   2
+165           Моцарт   2
+166                Н   2
+167        Нидштрасс   2
+168            Позен   2
+169          Пруссия   2
+170                Р   2
+171              Рим   2
+172              СДП   2
+173              СПД   2
+174             Союз   2
+175            Струв   2
+176          Тбилиси   2
+177            Тильд   2
+178           Троица   2
+179           Феликс   2
+180            Форст   2
+181         Ханнесль   2
+182          Хоэрнль   2
+183             Цитц   2
+184          Шекспир   2
+185           Ширман   2
+186          Шлахтен   2
+187         Шёнеберг   2
+188       Эбенхаузен   2
+189           Эльзас   2
+190           Эрфурт   2
+191           гуться   2
+192        искусство   2
+193      понедельник   2
+194         **Парвус   1
+195     *ROZA_Розино   1
+196               *В   1
+197          7.Жанет   1
+198           Cornus   1
+199           Jaures   1
+200    KOSTYA_Костик   1
+201    KOSTYA_костюм   1
+202       Kuhschelle   1
+203         LULU_лул   1
+204     NIU_Ниунисия   1
+205      NIU_Ниуниуш   1
+206        ROZA_Розе   1
+207   ROZA_Розенталь   1
+208      ROZA_Розина   1
+209      ROZA_Розины   1
+210       YuYu_Ююзия   1
+211               Ёж   1
+212               Ав   1
+213  Александерплатц   1
+214            Альпы   1
+215           Андциа   1
+216             Анкр   1
+217             Анна   1
+218         Антониус   1
+219         Арнштадт   1
+220          Ассирия   1
+221          Ахиллес   1
+222             Бабэ   1
+223            Бабёф   1
+224          Бавария   1
+225           Багдад   1
+226           Бармин   1
+227      Барнимштрас   1
+228      Бекерштрасс   1
+229          Белград   1
+230        Бернштейн   1
+231         Бисмарку   1
+232           Блюмер   1
+233         Бобиусиу   1
+234          Бобунио   1
+235            Боден   1
+236        Бокенхейм   1
+237         Болгария   1
+238            Бохум   1
+239      Брауеншвейг   1
+240         Бромберг   1
+241             Брус   1
+242             Бруц   1
+243           Брюмер   1
+244         Брюссель   1
+245           Бухара   1
+246         Бьёрнсон   1
+247             Бёрн   1
+248         Вавилона   1
+249           Вагнер   1
+250       Валенштейн   1
+251         Вартбург   1
+252              Вас   1
+253            Вашав   1
+254           Вашава   1
+255         Вебеллин   1
+256          Вегезак   1
+257        Вейзенбах   1
+258           Веймар   1
+259         Вейнберг   1
+260     Вейнбергский   1
+261           Венера   1
+262          Венеция   1
+263        Вестмайер   1
+264         Вестфаль   1
+265         Виктория   1
+266          Вильнус   1
+267           Винтер   1
+268           Вистен   1
+269       Влиссинген   1
+270            Войль   1
+271            Вольф   1
+272            Вурма   1
+273              ГДР   1
+274      Гейдельберг   1
+275             Гейн   1
+276             Гекк   1
+277            Гекка   1
+278            Генуя   1
+279           Гериша   1
+280          Геродот   1
+281          Гильген   1
+282         Гладбаха   1
+283            Глион   1
+284        Гольханду   1
+285            Греть   1
+286           Греция   1
+287           Гёринг   1
+288          Гёрлитц   1
+289           Гёрлиц   1
+290          Дормунд   1
+291            Дудук   1
+292          Дудуниа   1
+293      Дюссельдорф   1
+294     Дюссельдорфа   1
+295     Еженедельник   1
+296           Ейсика   1
+297            Жаной   1
+298             Жуан   1
+299            Жуаны   1
+300      Зальцбрунна   1
+301             Зари   1
+302        Зарисовка   1
+303         Заставка   1
+304         Зеландия   1
+305       Зилленбуха   1
+306             Зомм   1
+307            Зухон   1
+308           Изольд   1
+309      Империалист   1
+310              Иов   1
+311          Испания   1
+312          Йогишес   1
+313            Йоцио   1
+314                К   1
+315               К.   1
+316           Каберт   1
+317          Кайзеро   1
+318          Камбрай   1
+319           Канада   1
+320             Кант   1
+321            Канта   1
+322         Каттовиц   1
+323          Ква-ква   1
+324            Квинт   1
+325         Кенборуг   1
+326          Кессель   1
+327            Кихот   1
+328        Клейстема   1
+329            Кнорр   1
+330         Кобленце   1
+331          Конвент   1
+332  Константинополь   1
+333          Кристоф   1
+334          Кроссен   1
+335            Курта   1
+336          Кюстрин   1
+337            Кёльн   1
+338           Кёльна   1
+339      Кёнигрэтцер   1
+340       Кёнигсберг   1
+341   Ландвер-канала   1
+342          Легница   1
+343            Ленин   1
+344           Лертер   1
+345           Лигниц   1
+346          Лигница   1
+347            Лиман   1
+348      Линденштасс   1
+349     Линденштрасс   1
+350        Лихтенрад   1
+351          Локарно   1
+352              Лор   1
+353           Луигин   1
+354             Луна   1
+355       Люксамбург   1
+356            Лютер   1
+357        Магдегург   1
+358           Майнце   1
+359             Макс   1
+360          Манхейм   1
+361            Марат   1
+362         Маргарет   1
+363         Марешель   1
+364      Мариенфельд   1
+365            Маркс   1
+366         Марсталь   1
+367          Мартина   1
+368          Марысиа   1
+369           Матеус   1
+370          Мексика   1
+371               Ми   1
+372        Милосский   1
+373            Митек   1
+374             Млот   1
+375           Моабит   1
+376           Мольер   1
+377            Мутик   1
+378          Мэнцель   1
+379           Мёрикэ   1
+380     Набуходоносс   1
+381          Назарет   1
+382          Нинуниу   1
+383          Обнимай   1
+384           Одесса   1
+385           Опекун   1
+386        Оффенбахо   1
+387            Пабст   1
+388        Пеnеhбург   1
+389       Пентесилий   1
+390            Петер   1
+391            Познь   1
+392       Португалия   1
+393          Потсдам   1
+394        Потсдамер   1
+395          Пфемфер   1
+396            РСДРП   1
+397        Работница   1
+398          Равенна   1
+399            Равич   1
+400       Раппесвиль   1
+401           Рейнек   1
+402          Рейстаг   1
+403          Рембрат   1
+404         Ренесанс   1
+405           Репино   1
+406       Реформация   1
+407             Рига   1
+408      Ризенгебирг   1
+409           Рикард   1
+410           Риппер   1
+411         Росспатц   1
+412           Ростов   1
+413            Рубен   1
+414              Руш   1
+415           СДКПиЛ   1
+416             СДРП   1
+417            СДРРП   1
+418         СЛОВЕЧЕК   1
+419               СО   1
+420        Сальвазан   1
+421        Сальваран   1
+422        Самарканд   1
+423        Сан-Симон   1
+424             Сант   1
+425      Севастополь   1
+426        Сервантес   1
+427         Солинген   1
+428          Сонечка   1
+429            София   1
+430          Спартак   1
+431        Стокгольм   1
+432           Студио   1
+433           Стюарт   1
+434 Сулейки-Марианна   1
+435          Суматра   1
+436       Тальхеймер   1
+437          Теодеск   1
+438    Терезиенштадт   1
+439            Томас   1
+440          Тристан   1
+441        Туручанск   1
+442           Турция   1
+443      Уленшпигель   1
+444             Фейс   1
+445         Фейстема   1
+446        Фестхалла   1
+447          Фиделио   1
+448           Филиус   1
+449             Фихт   1
+450         Фландрия   1
+451           Форкер   1
+452           Франце   1
+453         Франциск   1
+454        Фрацискус   1
+455         Фрейбург   1
+456      Фюрстенхофа   1
+457      Хайдельберг   1
+458            Халла   1
+459          Ханесль   1
+460          Ханнесс   1
+461           Хансик   1
+462           Хасика   1
+463        Хауптманн   1
+464       Хельголанд   1
+465            Хоэрн   1
+466               ЦК   1
+467          Цеткина   1
+468             Цойс   1
+469          Цюлихау   1
+470           Червяк   1
+471            Чехия   1
+472               Ш.   1
+473        Шварцбург   1
+474        Шварцваль   1
+475           Шиллер   1
+476          Шиппель   1
+477       Шлахтензей   1
+478       Штадтхаген   1
+479            Штасс   1
+480        Штоппельн   1
+481         Штрёбель   1
+482         Штутгарт   1
+483           Шулить   1
+484              Шут   1
+485         Шуттгард   1
+486         Шуттгарт   1
+487          Экштейн   1
+488            Эссен   1
+489         Югенхайм   1
+490             Юлия   1
+491          адвокат   1
+492            буква   1
+493         введение   1
+494            вечер   1
+495           вперед   1
+496              год   1
+497        дождуться   1
+498           жалюзь   1
+499            жнивь   1
+500          зоопарк   1
+501    интернационал   1
+502             кафэ   1
+503         клясться   1
+504            книга   1
+505          коммуна   1
+506          корабль   1
+507          критика   1
+508             купэ   1
+509            кухен   1
+510           латынь   1
+511            мамин   1
+512            назад   1
+513           письмо   1
+514         почитать   1
+515          пятница   1
+516          работал   1
+517            рояль   1
+518     северо-запад   1
+519         сказалаХ   1
+520            слово   1
+521              смс   1
+522         стандарт   1
+523             твой   1
+524        трудность   1
+525             фейс   1
+526       фортепьяно   1
+527          царство   1
+528          четверг   1</code></pre>
 </div>
 </div>
-<p>The <code>echo: false</code> option disables the printing of code (only output is displayed).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Посчитаем упоминаемых персон - исправить списки - добавились МАРКЕРЫ</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Заменить леммы на МАРКЕРЫ!</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>persona_qty <span class="ot">&lt;-</span> all_roza_ann_tbl <span class="sc">|&gt;</span> </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(lemma <span class="sc">==</span> <span class="st">"Роза"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Клара"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Ниуниу"</span> </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Кост"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Цеткин"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Дифенбах"</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Люксембург"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Вронка"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Матильд"</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"кость"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Матильда"</span><span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Меринг"</span> </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Юя"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Костя"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"дорогой"</span> </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Бебель"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Шоенланк"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Гертруд"</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Либкнехта"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Парвус"</span> </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"«Ниуниу"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Вурм"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Дциодциу"</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Розин"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Адольф"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Розенталь"</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Розенфельд"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Розина"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Толст"</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Карл"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Марта"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Ниуниа"</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Пауль"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Розино"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Троиц"</span> </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Фаисст"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Ханс"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Дциодциус"</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Костик"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Лул"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Ниуниус"</span> </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"август"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Рикарда"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Турнер"</span> </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Бах"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Берндштейн"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Бы"</span> </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Гольдберг"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Дциодцио"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Каролус"</span> </span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Куртхен"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Луиза"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Мария"</span> </span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Мёрика"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Роберт"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Соня"</span> </span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Ханнес"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Хэнхен"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"«Дциодциу"</span> </span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Августина"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Боутен"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Веггис"</span> </span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Вронкэ"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Голсуорси"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Диудиа"</span> </span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Диудиу"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Дорогуль"</span> <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Каутский"</span> </span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Максим"</span> <span class="sc">|</span> token <span class="sc">==</span> <span class="st">"Мими"</span> </span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>         <span class="sc">|</span> lemma <span class="sc">==</span> <span class="st">"Юю"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(doc_id, lemma, token, upos, feats) <span class="sc">|&gt;</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(lemma, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>persona_qty</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        lemma   n
+1       Клара 176
+2     дорогой 153
+3        Карл 120
+4        Ханс 115
+5    Каутский 108
+6      Цеткин 103
+7      август  63
+8    Дифенбах  53
+9      Меринг  45
+10     Ханнес  38
+11     Парвус  37
+12     Бебель  31
+13 Люксембург  28
+14  Либкнехта  23
+15     Вронка  22
+16      Пауль  22
+17    Гертруд  21
+18 Розенфельд  18
+19       Соня  18
+20      Луиза  17
+21     Адольф  16
+22      Троиц  14
+23     Роберт  12
+24      Мария  11
+25      Марта  11
+26      Толст  10
+27     Фаисст  10
+28       Вурм   9
+29        Бах   8
+30     Максим   8
+31  Розенталь   8
+32     Турнер   8
+33   Дорогуль   7
+34     Мёрика   6
+35     Хэнхен   5
+36 Берндштейн   4
+37    Каролус   4
+38    Рикарда   4
+39         Бы   3
+40  Голсуорси   3
+41  Гольдберг   3
+42    Куртхен   3
+43  Августина   2
+44     Боутен   2
+45     Веггис   2
+46     Вронкэ   2</code></pre>
+</div>
+</div>
+<section id="section" class="level2">
+<h2 class="anchored" data-anchor-id="section"></h2>
 
 
 </section>
