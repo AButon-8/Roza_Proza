@@ -7,8 +7,8 @@ editor: visual
 ---
 
 ```{r}
-all_roza_tidy <- read.csv("/docs/data/all_roza_tidy.csv")
-rp_token_tidy <- read.csv("/docs/data/rp_token_tidy.csv")
+all_roza_tidy <- read.csv("docs/data/all_roza_tidy.csv")
+rp_token_tidy <- read.csv("docs/data/rp_token_tidy.csv")
 
 ```
 
@@ -23,6 +23,7 @@ all_roza_tidy |>
   geom_col(show.legend = FALSE) +
   coord_flip() +
   labs(x = NULL, y = NULL)
+
 ```
 
 ```{r}
@@ -34,6 +35,7 @@ rp_token_tidy |>
   geom_col(show.legend = FALSE) +
   coord_flip() +
   labs(x = NULL, y = NULL)
+
 ```
 
 ```{r}
